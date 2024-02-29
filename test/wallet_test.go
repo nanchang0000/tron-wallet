@@ -1,7 +1,7 @@
 package test
 
 import (
-	tronWallet "github.com/ranjbar-dev/tron-wallet"
+	tronWallet "github.com/nanchang0000/tron-wallet"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
