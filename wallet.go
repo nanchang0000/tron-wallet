@@ -302,17 +302,19 @@ func (t *TronWallet) UpdatePermission(signer string) (string, error) {
 	if err != nil {
 		panic(err)
 	}
+	threshold, _ := strconv.ParseInt("2", 10, 64)
+	keyValue, _ := strconv.ParseInt("1", 10, 64)
 	var keys []map[string]int64
-	keys = append(keys, map[string]int64{t.AddressBase58: 1})
-	keys = append(keys, map[string]int64{signer: 1})
+	keys = append(keys, map[string]int64{t.AddressBase58: keyValue})
+	keys = append(keys, map[string]int64{signer: keyValue})
 	owner := map[string]interface{}{
-		"threshold": 2,
+		"threshold": threshold,
 		"keys":      []map[string]int64{},
 	}
 	var actives []map[string]interface{}
 	actives = append(actives, map[string]interface{}{
 		"name":      "active",
-		"threshold": 2,
+		"threshold": threshold,
 		"operations": map[string]bool{
 			"7fff1fc0033e0300000000000000000000000000000000000000000000000000": true,
 		},
