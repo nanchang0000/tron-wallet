@@ -321,6 +321,9 @@ func (t *TronWallet) UpdatePermission(signer string) (string, error) {
 		"keys": keys,
 	})
 	tx, err := c.UpdateAccountPermission(t.AddressBase58, owner, nil, actives)
+	if err != nil {
+		return "", err
+	}
 	signedTx, err := signTransaction(tx, privateRCDSA)
 	if err != nil {
 		return "", err
