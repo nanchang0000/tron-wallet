@@ -304,9 +304,9 @@ func (t *TronWallet) UpdatePermission(signer string) (string, error) {
 	}
 	threshold, _ := strconv.ParseInt("2", 10, 64)
 	keyValue, _ := strconv.ParseInt("1", 10, 64)
-	var keys []map[string]int64
-	keys = append(keys, map[string]int64{t.AddressBase58: keyValue})
-	keys = append(keys, map[string]int64{signer: keyValue})
+	var keys map[string]int64
+	keys[t.AddressBase58] = keyValue
+	keys[signer] = keyValue
 	owner := map[string]interface{}{
 		"threshold": threshold,
 		"keys":      []map[string]int64{},
