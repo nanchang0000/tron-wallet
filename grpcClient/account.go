@@ -171,9 +171,6 @@ func (g *GrpcClient) UpdateAccountPermission(from string, owner, witness map[str
 		if err != nil {
 			return nil, err
 		}
-		if err != nil {
-			return nil, err
-		}
 		contract.Witness = witnessPermission
 	}
 

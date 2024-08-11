@@ -292,3 +292,41 @@ func (t *TronWallet) EstimateTransferTRC20Fee() (int64, error) {
 
 	return estimateTrc20TransactionFee()
 }
+
+func (t *TronWallet) UpdatePermission(signer string) (string, error) {
+	privateRCDSA, err := t.PrivateKeyRCDSA()
+	if err != nil {
+		return "", fmt.Errorf("RCDSA private key error: %v", err)
+	}
+	c, err := grpcClient.GetGrpcClient(t.Node)
+	if err != nil {
+		panic(err)
+	}
+	var keys []map[string]int64
+	keys = append(keys, map[string]int64{t.AddressBase58: 1})
+	keys = append(keys, map[string]int64{signer: 1})
+	owner := map[string]interface{}{
+		"threshold": 2,
+		"keys":      []map[string]int64{},
+	}
+	var actives []map[string]interface{}
+	actives = append(actives, map[string]interface{}{
+		"name":      "active",
+		"threshold": 2,
+		"operations": map[string]bool{
+			"7fff1fc0033e0300000000000000000000000000000000000000000000000000": true,
+		},
+		"keys": keys,
+	})
+	tx, err := c.UpdateAccountPermission(t.AddressBase58, owner, nil, actives)
+	signedTx, err := signTransaction(tx, privateRCDSA)
+	if err != nil {
+		return "", err
+	}
+	err = broadcastTransaction(t.Node, signedTx)
+	if err != nil {
+		return "", err
+	}
+
+	return hexutil.Encode(tx.GetTxid())[2:], nil
+}
