@@ -14,6 +14,11 @@ var validToAddress = "TJnsY5bGiwuPCQFismQDwyVTPAn7M88888"
 var invalidToAddress = "TJnsY5bGiwuPCQQDwyVTPAnM88888"
 var trxAmount int64 = 10000
 var trc20Amount int64 = 10000
+var nileNode = enums.NILE_NODE
+var childAddress = "TNenhn2ennQvxcRuMZ6VKKPacMDDujPjNK"
+var childPrivateKey = "cc492f384b5929feed9995abb103a0fc914304ac319dbd3efbb813abcc3dbd9f"
+var permissionAddress = "TVv3U8MDTwDzH2RAF47dJNbhMxqzWnFRji"
+var permissionPrivateKey = "b4b50da5a86ef17148b6e14ca9a86e71ab09e7724a7445f766c5819ec550ab8f"
 
 func wallet() *tronWallet.TronWallet {
 	w, _ := tronWallet.CreateTronWallet(node, validPrivateKey)

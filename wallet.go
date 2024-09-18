@@ -216,14 +216,14 @@ func (t *TronWallet) Balance() (int64, error) {
 	return b.Balance, nil
 }
 
-func (t *TronWallet) BalanceTRC20(token *Token) (int64, error) {
+func (t *TronWallet) BalanceTRC20(token *Token) (*big.Int, error) {
 
 	balance, err := token.GetBalance(t.Node, t.AddressBase58)
 	if err != nil {
-		return 0, err
+		return big.NewInt(0), err
 	}
 
-	return balance.Int64(), nil
+	return balance, nil
 }
 
 // transaction

@@ -7,6 +7,7 @@ func CreateNode(grpcNode string) Node {
 }
 
 const (
+	LOCAL_NODE          Node = "127.0.0.1:50051"
 	MAIN_NODE           Node = "grpc.trongrid.io:50051"
 	SHASTA_NODE         Node = "grpc.shasta.trongrid.io:50051"
 	NILE_NODE           Node = "grpc.nile.trongrid.io:50051"

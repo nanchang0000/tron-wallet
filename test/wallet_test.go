@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	tronWallet "github.com/nanchang0000/tron-wallet"
 	"github.com/stretchr/testify/assert"
 	"strings"
@@ -10,6 +11,7 @@ import (
 // GenerateTronWallet test
 func TestGenerateWallet(t *testing.T) {
 	w := tronWallet.GenerateTronWallet(node)
+	fmt.Println(w)
 	if w == nil {
 		t.Errorf("GenerateTronWallet res was incorect, got: %q, want: %q.", w, "*tronWallet")
 	}
@@ -109,11 +111,12 @@ func TestPrivateKeyBytes(t *testing.T) {
 
 // Balance test
 func TestBalance(t *testing.T) {
-	w := wallet()
-
-	_, err := w.Balance()
+	w, _ := tronWallet.CreateTronWallet(nileNode, childPrivateKey)
+	balance, err := w.Balance()
 	if err != nil {
 		t.Errorf("Balance error was incorect, got: %q, want: %q.", err, "nil")
+	} else {
+		t.Logf("Balance: %d", balance)
 	}
 }
 
@@ -129,7 +132,7 @@ func TestBalanceTRC20(t *testing.T) {
 
 // Transfer test
 func TestTransfer(t *testing.T) {
-	w := wallet()
+	w, _ := tronWallet.CreateTronWallet(nileNode, childPrivateKey)
 
 	_, err := w.Transfer(invalidToAddress, trxAmount)
 	if err == nil {
@@ -147,7 +150,7 @@ func TestTransfer(t *testing.T) {
 
 // TransferTRC20 test
 func TestTransferTRC20(t *testing.T) {
-	w := wallet()
+	w, _ := tronWallet.CreateTronWallet(nileNode, childPrivateKey)
 	_t := token()
 
 	_, err := w.TransferTRC20(_t, invalidToAddress, trc20Amount)
@@ -162,4 +165,48 @@ func TestTransferTRC20(t *testing.T) {
 	if len(txId) == 0 {
 		t.Errorf("Transfer txId was incorect, got: %q, want: %q.", txId, "not nil")
 	}
+}
+
+// TestUpdatePermissions test
+func TestUpdatePermission(t *testing.T) {
+	w, err := tronWallet.CreateTronWallet(nileNode, childPrivateKey)
+	if err != nil {
+		t.Errorf("import wallet error was incorect, got: %q, want: %q.", err, "nil")
+		return
+	}
+	txId, err := w.UpdatePermission(permissionAddress)
+	if err != nil {
+		t.Errorf("update permission error was incorect, got: %q, want: %q.", err, "nil")
+		return
+	}
+	t.Logf("txid: %s", txId)
+}
+
+// TestMultiSignTransfer test
+func TestMultiTrc20Transfer(t *testing.T) {
+	childWallet, err := tronWallet.CreateTronWallet(nileNode, childPrivateKey)
+	if err != nil {
+		t.Errorf("import child wallet error was incorect, got: %q, want: %q.", err, "nil")
+		return
+	}
+	permissionWallet, err := tronWallet.CreateTronWallet(nileNode, permissionPrivateKey)
+	if err != nil {
+		t.Errorf("import permission wallet error was incorect, got: %q, want: %q.", err, "nil")
+		return
+	}
+	specToken := &tronWallet.Token{ContractAddress: "TU2T8vpHZhCNY8fXGVaHyeZrKm8s6HEXWe"}
+	trc20Balance, err := childWallet.BalanceTRC20(specToken)
+	if err != nil {
+		t.Errorf("get balance error was incorect, got: %q, want: %q.", err, "nil")
+		return
+	} else {
+		t.Logf("child wallet balance: %s", trc20Balance.String())
+	}
+	txId, err := childWallet.MultiTransferTrc20(nileNode, permissionWallet, "TRRi94AJ4h2S1rpnsQnGi4dsvbSZLj38hc", trc20Balance, specToken)
+	if err != nil {
+		t.Errorf("multi sign transfer error was incorect, got: %q, want: %q.", err, "nil")
+		return
+	}
+	t.Logf("txid: %s", txId)
+
 }
