@@ -41,6 +41,35 @@ func (t *TronWallet) CreateAndBroadcastMultiTransaction(node enums.Node, fromAdd
 	return string(transaction.GetTxid()), nil
 }
 
+func (t *TronWallet) MultiTransferTrx(node enums.Node, permissionWallet *TronWallet, targetAddress string, amount *big.Int) (string, error) {
+	childPrivateKey, _ := t.PrivateKeyRCDSA()
+	permissionPrivateKey, _ := permissionWallet.PrivateKeyRCDSA()
+	transaction, err := createTransactionInput(node, t.AddressBase58, targetAddress, amount.Int64())
+	if err != nil {
+		return "", err
+	}
+	transaction, err = signTransaction(transaction, childPrivateKey)
+	if err != nil {
+		return "", err
+	}
+	transaction, err = signTransaction(transaction, permissionPrivateKey)
+	if err != nil {
+		return "", err
+	}
+	c, err := grpcClient.GetGrpcClient(node)
+	if err != nil {
+		return "", err
+	}
+	res, err := c.Broadcast(transaction.Transaction)
+	if err != nil {
+		return "", err
+	}
+	if !res.Result {
+		return "", errors.New(res.Code.String())
+	}
+	return hexutil.Encode(transaction.GetTxid())[2:], nil
+}
+
 func (t *TronWallet) MultiTransferTrc20(node enums.Node, permissionWallet *TronWallet, targetAddress string, amount *big.Int, token *Token) (string, error) {
 	childPrivateKey, _ := t.PrivateKeyRCDSA()
 	permissionPrivateKey, _ := permissionWallet.PrivateKeyRCDSA()
